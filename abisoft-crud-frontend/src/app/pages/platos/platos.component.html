@@ -1,0 +1,145 @@
+<p-panel header="Lista de platos">
+  <div class="card">
+    <p-toolbar styleClass="mb-4 gap-2">
+      <ng-template pTemplate="left">
+        <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success mr-2"
+                (click)="openNew()"></button>
+      </ng-template>
+
+      <!--      <ng-template pTemplate="right">-->
+      <!--        <button pButton pRipple label="Exportar" icon="pi pi-upload" class="p-button-help"></button>-->
+      <!--      </ng-template>-->
+    </p-toolbar>
+
+    <p-table #dt [value]="platos"
+             [rows]="10"
+             [paginator]="true"
+             [globalFilterFields]="['nombre']"
+             [tableStyle]="{'min-width': '75rem'}"
+             [(selection)]="platosSeleccionados"
+             [rowHover]="true"
+             dataKey="id"
+             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros."
+             [showCurrentPageReport]="true">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 4rem">
+            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+          </th>
+          <th pSortableColumn="name" style="min-width:15rem">
+            Nombre
+            <p-sortIcon field="name"></p-sortIcon>
+          </th>
+          <th pSortableColumn="price">
+            Precio
+            <p-sortIcon field="price"></p-sortIcon>
+          </th>
+          <th pSortableColumn="category" style="min-width:10rem">
+            Color
+            <p-sortIcon field="category"></p-sortIcon>
+          </th>
+          <th pSortableColumn="rating">
+            Fecha
+            <p-sortIcon field="rating"></p-sortIcon>
+          </th>
+          <th pSortableColumn="rating">
+            Inicio de Actividad
+            <p-sortIcon field="rating"></p-sortIcon>
+          </th>
+          <th pSortableColumn="rating">
+            Oferta
+            <p-sortIcon field="rating"></p-sortIcon>
+          </th>
+          <th pSortableColumn="inventoryStatus" style="min-width:10rem">
+            Estado
+            <p-sortIcon field="inventoryStatus"></p-sortIcon>
+          </th>
+          <th></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-plato>
+        <tr>
+          <td>
+            <p-tableCheckbox [value]="plato"></p-tableCheckbox>
+          </td>
+          <td>{{plato.nombre}}</td>
+          <td>{{plato.precio | currency:'USD'}}</td>
+          <td>{{plato.color}}</td>
+          <td>{{plato.fecha |date:'dd/MM/yyyy'}}</td>
+          <td>{{plato.inicioActividad |date:'dd/MM/yyyy'}}</td>
+          <td>
+            <span *ngIf="plato.oferta">SI</span>
+            <span *ngIf="!plato.oferta">NO</span>
+          </td>
+          <td>
+            <span *ngIf="plato.estado == 0" class="active">ACTIVO</span>
+            <span *ngIf="plato.estado != 0" class="inactive">INACTIVO</span>
+          </td>
+          <td>
+            <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
+                    (click)="editDialog(plato)"></button>
+            <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning"
+                    style="margin-left: 5px"
+                    (click)="delete(plato)"></button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="summary">
+        <div class="flex align-items-center justify-content-between">
+          En total hay {{platos ? platos.length : 0 }} platos.
+        </div>
+      </ng-template>
+    </p-table>
+  </div>
+</p-panel>
+
+<p-dialog [(visible)]="dialogo" position="top" [style]="{width: '50vw'}" header="Nuevo Plato"
+          [modal]="true" styleClass="p-fluid" [draggable]="false"
+          [resizable]="false" appendTo="body">
+  <ng-template pTemplate="content">
+
+    <div class="field mb-2">
+      <label for="name">Nombre</label>
+      <input type="text" pInputText id="name" [(ngModel)]="plato.nombre" required autofocus/>
+      <small class="p-error" *ngIf="submitted && !plato.nombre">El nombre es requerido.</small>
+    </div>
+
+    <div class="formgrid grid mb-2">
+      <div class="field col">
+        <label for="price">Precio</label>
+        <p-inputNumber id="price" [(ngModel)]="plato.precio"
+                       locale="es-ES"></p-inputNumber>
+      </div>
+    </div>
+
+    <div class="field mb-2">
+      <label for="name">Color</label>
+      <input type="text" pInputText [(ngModel)]="plato.color" required autofocus/>
+      <small class="p-error" *ngIf="submitted && !plato.color">El color es requerido.</small>
+    </div>
+
+    <div class="field mb-2">
+      <label for="name">Fecha</label>
+      <p-calendar [(ngModel)]="plato.fecha" appendTo="body"></p-calendar>
+      <small class="p-error" *ngIf="submitted && !plato.fecha">La fecha es requerida.</small>
+    </div>
+
+    <div class="field">
+      <label for="name">Inicio Actividad</label>
+      <p-calendar [(ngModel)]="plato.inicioActividad" appendTo="body"></p-calendar>
+      <small class="p-error" *ngIf="submitted && !plato.inicioActividad">El inicio de actividad es requerido.</small>
+    </div>
+    <div class="field">
+      <label for="name">Oferta</label><br/>
+      <p-inputSwitch [(ngModel)]="plato.oferta"></p-inputSwitch>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-success" (click)="save()"></button>
+    <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-danger" (click)="hideDialog()"></button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
